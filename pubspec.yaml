@@ -1,0 +1,28 @@
+name: ecommerce_clean_app
+description: Production-ready e-commerce Flutter app with Clean Architecture, BLoC, Dio, and Hive.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+  dio: ^5.9.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  get_it: ^8.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  hive_generator: ^2.0.1
+
+flutter:
+  uses-material-design: true
