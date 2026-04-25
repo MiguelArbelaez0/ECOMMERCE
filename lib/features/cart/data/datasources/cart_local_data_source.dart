@@ -30,7 +30,7 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
   @override
   Future<void> addToCart(CartItemModel item) async {
     try {
-      final existingKey = box.keys.cast<dynamic?>().firstWhere(
+      final existingKey = box.keys.cast<dynamic>().firstWhere(
             (key) => box.get(key)?.productId == item.productId,
             orElse: () => null,
           );
@@ -58,7 +58,7 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
   @override
   Future<void> removeFromCart(int productId) async {
     try {
-      final key = box.keys.cast<dynamic?>().firstWhere(
+      final key = box.keys.cast<dynamic>().firstWhere(
             (k) => box.get(k)?.productId == productId,
             orElse: () => null,
           );
@@ -73,7 +73,7 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
   @override
   Future<void> updateQuantity(int productId, int quantity) async {
     try {
-      final key = box.keys.cast<dynamic?>().firstWhere(
+      final key = box.keys.cast<dynamic>().firstWhere(
             (k) => box.get(k)?.productId == productId,
             orElse: () => null,
           );
