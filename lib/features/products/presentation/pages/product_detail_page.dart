@@ -4,45 +4,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../cart/domain/entities/cart_item.dart';
 import '../../../cart/presentation/bloc/cart_bloc.dart';
 import '../../domain/entities/product.dart';
-import '../bloc/product_bloc.dart';
 
-class ProductDetailPage extends StatefulWidget {
-  final int productId;
+class ProductDetailPage extends StatelessWidget {
+  final Product product;
 
-  const ProductDetailPage({super.key, required this.productId});
-
-  @override
-  State<ProductDetailPage> createState() => _ProductDetailPageState();
-}
-
-class _ProductDetailPageState extends State<ProductDetailPage> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<ProductBloc>().add(ProductDetailRequested(widget.productId));
-  }
+  const ProductDetailPage({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Product Detail')),
-      body: BlocBuilder<ProductBloc, ProductState>(
-        builder: (context, state) {
-          if (state is ProductLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state is ProductError) {
-            return Center(child: Text(state.message));
-          }
-
-          if (state is ProductDetailLoaded) {
-            return _ProductDetailContent(product: state.product);
-          }
-
-          return const SizedBox.shrink();
-        },
-      ),
+      body: _ProductDetailContent(product: product),
     );
   }
 }
