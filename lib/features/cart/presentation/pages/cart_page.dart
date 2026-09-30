@@ -10,7 +10,16 @@ class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cart')),
+      appBar: AppBar(
+        title: const Text('Cart'),
+        actions: [
+          IconButton(
+            tooltip: 'Clear cart',
+            onPressed: () => context.read<CartBloc>().add(const CartCleared()),
+            icon: const Icon(Icons.delete_sweep_outlined),
+          ),
+        ],
+      ),
       body: BlocBuilder<CartBloc, CartState>(
         builder: (context, state) {
           if (state.isLoading) {
@@ -35,13 +44,17 @@ class CartPage extends StatelessWidget {
                     final item = state.items[index];
                     return CartItemTile(
                       item: item,
-                      onRemove: () => context.read<CartBloc>().add(CartItemRemoved(item.productId)),
-                      onIncrement: () => context
+                      onRemove: () => context
                           .read<CartBloc>()
-                          .add(CartQuantityUpdated(productId: item.productId, quantity: item.quantity + 1)),
-                      onDecrement: () => context
-                          .read<CartBloc>()
-                          .add(CartQuantityUpdated(productId: item.productId, quantity: item.quantity - 1)),
+                          .add(CartItemRemoved(item.productId)),
+                      onIncrement: () => context.read<CartBloc>().add(
+                          CartQuantityUpdated(
+                              productId: item.productId,
+                              quantity: item.quantity + 1)),
+                      onDecrement: () => context.read<CartBloc>().add(
+                          CartQuantityUpdated(
+                              productId: item.productId,
+                              quantity: item.quantity - 1)),
                     );
                   },
                 ),
@@ -61,7 +74,8 @@ class CartPage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    FilledButton(onPressed: () {}, child: const Text('Checkout')),
+                    FilledButton(
+                        onPressed: () {}, child: const Text('Checkout')),
                   ],
                 ),
               ),

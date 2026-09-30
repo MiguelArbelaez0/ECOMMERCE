@@ -24,6 +24,13 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
           .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
           .toList(growable: false);
     } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout) {
+        throw NetworkException(
+            'Unable to connect. Check your internet connection.');
+      }
       throw ServerException(
         e.response?.data.toString() ??
             e.message ??
@@ -35,9 +42,17 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   @override
   Future<ProductModel> getProductById(int id) async {
     try {
-      final Response<dynamic> response = await apiClient.dio.get('/products/$id');
+      final Response<dynamic> response =
+          await apiClient.dio.get('/products/$id');
       return ProductModel.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout) {
+        throw NetworkException(
+            'Unable to connect. Check your internet connection.');
+      }
       throw ServerException(
         e.response?.data.toString() ??
             e.message ??

@@ -17,6 +17,10 @@ class ProductRepositoryImpl implements ProductRepository {
       return Right(products);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (_) {
+      return const Left(UnexpectedFailure('An unexpected error occurred'));
     }
   }
 
@@ -27,6 +31,10 @@ class ProductRepositoryImpl implements ProductRepository {
       return Right(product);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } catch (_) {
+      return const Left(UnexpectedFailure('An unexpected error occurred'));
     }
   }
 }

@@ -9,3 +9,9 @@ class CacheException implements Exception {
 
   CacheException(this.message);
 }
+
+class NetworkException implements Exception {
+  final String message;
+
+  const NetworkException(this.message);
+}

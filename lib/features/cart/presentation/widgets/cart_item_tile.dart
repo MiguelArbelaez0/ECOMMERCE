@@ -35,7 +35,8 @@ class CartItemTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(item.title,
+                      maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Text(
                     '\$${item.price.toStringAsFixed(2)}',
@@ -44,15 +45,20 @@ class CartItemTile extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      IconButton(onPressed: onDecrement, icon: const Icon(Icons.remove_circle_outline)),
+                      IconButton(
+                          onPressed: onDecrement,
+                          icon: const Icon(Icons.remove_circle_outline)),
                       Text('${item.quantity}'),
-                      IconButton(onPressed: onIncrement, icon: const Icon(Icons.add_circle_outline)),
+                      IconButton(
+                          onPressed: onIncrement,
+                          icon: const Icon(Icons.add_circle_outline)),
                     ],
                   ),
                 ],
               ),
             ),
-            IconButton(onPressed: onRemove, icon: const Icon(Icons.delete_outline)),
+            IconButton(
+                onPressed: onRemove, icon: const Icon(Icons.delete_outline)),
           ],
         ),
       ),

@@ -18,6 +18,8 @@ class CartRepositoryImpl implements CartRepository {
       return const Right(null);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
+    } catch (_) {
+      return const Left(UnexpectedFailure('An unexpected error occurred'));
     }
   }
 
@@ -25,9 +27,12 @@ class CartRepositoryImpl implements CartRepository {
   Future<Either<Failure, List<CartItem>>> getCartItems() async {
     try {
       final models = await localDataSource.getCartItems();
-      return Right(models.map((item) => item.toEntity()).toList(growable: false));
+      return Right(
+          models.map((item) => item.toEntity()).toList(growable: false));
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
+    } catch (_) {
+      return const Left(UnexpectedFailure('An unexpected error occurred'));
     }
   }
 
@@ -38,16 +43,33 @@ class CartRepositoryImpl implements CartRepository {
       return const Right(null);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
+    } catch (_) {
+      return const Left(UnexpectedFailure('An unexpected error occurred'));
     }
   }
 
   @override
-  Future<Either<Failure, void>> updateQuantity(int productId, int quantity) async {
+  Future<Either<Failure, void>> updateQuantity(
+      int productId, int quantity) async {
     try {
       await localDataSource.updateQuantity(productId, quantity);
       return const Right(null);
     } on CacheException catch (e) {
       return Left(CacheFailure(e.message));
+    } catch (_) {
+      return const Left(UnexpectedFailure('An unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> clearCart() async {
+    try {
+      await localDataSource.clearCart();
+      return const Right(null);
+    } on CacheException catch (e) {
+      return Left(CacheFailure(e.message));
+    } catch (_) {
+      return const Left(UnexpectedFailure('An unexpected error occurred'));
     }
   }
 }

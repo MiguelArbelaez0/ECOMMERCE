@@ -10,4 +10,6 @@ abstract class CartRepository {
   Future<Either<Failure, void>> removeFromCart(int productId);
 
   Future<Either<Failure, void>> updateQuantity(int productId, int quantity);
+
+  Future<Either<Failure, void>> clearCart();
 }

@@ -11,6 +11,8 @@ abstract class CartLocalDataSource {
   Future<void> removeFromCart(int productId);
 
   Future<void> updateQuantity(int productId, int quantity);
+
+  Future<void> clearCart();
 }
 
 class CartLocalDataSourceImpl implements CartLocalDataSource {
@@ -99,6 +101,15 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
       );
     } catch (e) {
       throw CacheException('Could not update cart quantity');
+    }
+  }
+
+  @override
+  Future<void> clearCart() async {
+    try {
+      await box.clear();
+    } catch (_) {
+      throw CacheException('Could not clear cart');
     }
   }
 }

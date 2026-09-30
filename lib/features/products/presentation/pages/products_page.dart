@@ -39,14 +39,16 @@ class _ProductsPageState extends State<ProductsPage> {
         actions: [
           BlocBuilder<CartBloc, CartState>(
             builder: (context, state) {
-              final itemCount = state.items.fold<int>(0, (sum, item) => sum + item.quantity);
+              final itemCount =
+                  state.items.fold<int>(0, (sum, item) => sum + item.quantity);
               return Stack(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.shopping_cart_outlined),
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute<void>(builder: (_) => const CartPage()),
+                        MaterialPageRoute<void>(
+                            builder: (_) => const CartPage()),
                       );
                     },
                   ),
@@ -59,7 +61,8 @@ class _ProductsPageState extends State<ProductsPage> {
                         backgroundColor: Colors.red,
                         child: Text(
                           '$itemCount',
-                          style: const TextStyle(fontSize: 10, color: Colors.white),
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.white),
                         ),
                       ),
                     ),
@@ -83,7 +86,9 @@ class _ProductsPageState extends State<ProductsPage> {
                   Text(state.message, textAlign: TextAlign.center),
                   const SizedBox(height: 12),
                   FilledButton(
-                    onPressed: () => context.read<ProductBloc>().add(const ProductsRequested()),
+                    onPressed: () => context
+                        .read<ProductBloc>()
+                        .add(const ProductsRequested()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -92,10 +97,15 @@ class _ProductsPageState extends State<ProductsPage> {
           }
 
           if (state is ProductsLoaded) {
-            final categories = <String>{'Todas', ...state.products.map((e) => e.category)}.toList();
+            final categories = <String>{
+              'Todas',
+              ...state.products.map((e) => e.category)
+            }.toList();
             final filteredProducts = _selectedCategory == 'Todas'
                 ? state.products
-                : state.products.where((p) => p.category == _selectedCategory).toList();
+                : state.products
+                    .where((p) => p.category == _selectedCategory)
+                    .toList();
 
             return Column(
               children: [
