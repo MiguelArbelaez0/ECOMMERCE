@@ -14,7 +14,7 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Either<Failure, List<Product>>> getProducts() async {
     try {
       final products = await remoteDataSource.getProducts();
-      return Right(products);
+      return Right(products.map((model) => model.toEntity()).toList());
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
@@ -28,7 +28,7 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Either<Failure, Product>> getProductById(int id) async {
     try {
       final product = await remoteDataSource.getProductById(id);
-      return Right(product);
+      return Right(product.toEntity());
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
