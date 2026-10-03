@@ -1,75 +1,191 @@
-# E-Commerce Flutter App
+# E-Commerce Flutter
 
-Aplicación de comercio electrónico organizada por feature y capas, con Fake Store API para productos y Hive para persistir el carrito localmente.
+A Flutter e-commerce application built with Dart, BLoC, Dio, Hive, and GetIt, integrating a REST API for product data and local persistence for the shopping cart.
 
-## Stack
+## 📱 Overview
 
-- Flutter 3.47.5 y Dart 3.13.4 (versiones objetivo)
-- `flutter_bloc` y `equatable` para presentación y estados
-- `dio` para HTTP
-- `hive` / `hive_flutter` para persistencia local
-- `get_it` para inyección de dependencias
+ECOMMERCE is a Flutter application that demonstrates the implementation of a mobile shopping experience with product discovery, product details, cart management, and persistent local cart data.
 
-El constraint Dart de `pubspec.yaml` expresa la compatibilidad mínima del SDK. Usa las versiones objetivo anteriores para validar la configuración.
+The project focuses on practical Flutter development, reactive state management, API integration, and local persistence.
 
-## Arquitectura
+## 🚀 Features
+
+- Product catalog
+- Product information and details
+- Product data from the Fake Store API
+- Shopping cart
+- Add and remove products from the cart
+- Persistent cart data
+- Reactive state management with BLoC
+- REST API integration
+- Dependency injection
+- Layered application structure
+- Responsive Flutter interface
+
+## 🏗️ Architecture
+
+The application separates presentation, application logic, and external data access.
+
+The main flow can be represented as:
 
 ```text
-Presentation (Pages, Widgets, BLoCs)
-        ↓
-Domain (Use Cases, Repository contracts, Entities)
-        ↑
-Data (Repository implementations, Data Sources, Models)
-        ↓
-External sources (Fake Store API / Hive)
+Presentation
+     ↓
+BLoC
+     ↓
+Repository
+     ↓
+Dio
+     ↓
+Fake Store API
 ```
 
-Domain define las operaciones y contratos; Data implementa esos contratos y contiene las integraciones Dio/Hive. Las páginas y BLoCs dependen de casos de uso. `lib/injection/injection_container.dart` configura Data Sources, repositorios, casos de uso y BLoCs.
+Cart persistence is handled locally:
 
-## Estructura
+```text
+Cart State
+    ↓
+Hive
+    ↓
+Local Storage
+```
+
+## 🧩 Technologies
+
+| Technology | Usage |
+|---|---|
+| Flutter | Application framework |
+| Dart | Programming language |
+| flutter_bloc | State management |
+| BLoC | Application state |
+| Dio | HTTP client |
+| Hive | Local persistence |
+| GetIt | Dependency injection |
+| Equatable | Value equality |
+| Fake Store API | Product data |
+
+## 🛍️ Product Catalog
+
+The application retrieves product information from the Fake Store API and presents it through the Flutter interface.
+
+Product data is obtained through the data layer instead of coupling UI components directly to HTTP requests.
+
+## 🛒 Shopping Cart
+
+The cart allows users to:
+
+- Add products
+- Remove products
+- Review selected products
+- Maintain cart state
+- Persist cart information locally
+
+Hive is used to preserve cart data between application sessions.
+
+## 💾 Local Persistence
+
+Hive provides local storage for the shopping cart.
+
+This allows cart information to remain available after closing and reopening the application without requiring a remote order or payment backend.
+
+## ⚡ State Management
+
+BLoC is used to manage application state and coordinate changes between the interface and application logic.
+
+This keeps UI components focused on presentation while state transitions and operations remain in dedicated logic components.
+
+## 💉 Dependency Injection
+
+`GetIt` is used for dependency registration and resolution.
+
+This centralizes dependency configuration and reduces direct coupling between application components.
+
+## 🌐 API Integration
+
+The application uses `Dio` as its HTTP client to communicate with the Fake Store API.
+
+The API provides the product catalog consumed by the application.
+
+The project is focused on the client-side e-commerce experience; it does not implement real payment processing or production order fulfillment.
+
+## 📂 Project Structure
+
+The project uses a layered organization to separate responsibilities:
 
 ```text
 lib/
-  core/
-    error/                 # Exceptions y Failures compartidos
-    network/               # Cliente Dio centralizado
-    utils/                 # Either
-  features/
-    products/
-      data/                # API, modelo JSON, implementación de repositorio
-      domain/              # Product, contrato y casos de uso
-      presentation/        # BLoC, páginas y widgets
-    cart/
-      data/                # Data Source Hive, modelo y repositorio
-      domain/              # CartItem, contrato y casos de uso
-      presentation/        # BLoC, página y widgets
-  injection/
-    injection_container.dart
-  main.dart
-test/                      # Pruebas organizadas por feature/capa
+├── core/
+├── data/
+├── domain/
+└── presentation/
 ```
 
-## Funcionalidad implementada
+### Presentation
 
-- Lista y detalle de productos desde Fake Store API.
-- Filtro de productos por categoría en la interfaz.
-- Agregar, quitar, cambiar cantidad, vaciar y restaurar el carrito persistido.
-- Cálculo del total del carrito a partir de sus artículos.
-- Estados de carga y error en BLoCs.
+Contains screens, widgets, and BLoC state management.
 
-El checkout es solo una acción visual; no procesa pagos ni crea pedidos.
+### Domain
 
-## API
+Contains application entities, business logic, and repository abstractions.
 
-- `GET https://fakestoreapi.com/products`
-- `GET https://fakestoreapi.com/products/{id}`
+### Data
 
-## Comandos
+Contains API communication, models, and repository implementations.
+
+### Core
+
+Contains shared application functionality and utilities.
+
+## ⚙️ Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/MiguelArbelaez0/ECOMMERCE.git
+cd ECOMMERCE
+```
+
+### 2. Install dependencies
 
 ```bash
 flutter pub get
-dart format lib test
-flutter analyze
-flutter test
+```
+
+### 3. Run the application
+
+```bash
 flutter run
 ```
+
+Make sure Flutter and Dart are correctly installed and configured on your development environment.
+
+## 🎯 What This Project Demonstrates
+
+This project demonstrates practical experience with:
+
+- Flutter and Dart
+- BLoC state management
+- REST API integration
+- Dio
+- Hive local persistence
+- Dependency injection with GetIt
+- Shopping cart management
+- Product catalog interfaces
+- Layered application architecture
+- Separation of concerns
+- Responsive UI development
+
+## 📌 Project Status
+
+The project is a completed academic/personal development project created to practice Flutter application development, API consumption, state management, and local persistence.
+
+The checkout flow is part of the application interface and does not process real payments or orders.
+
+## 👨‍💻 Author
+
+**Miguel Arbeláez Vallejo**
+
+Software Developer | Flutter / Dart | Full-Stack Development
+
+- GitHub: https://github.com/MiguelArbelaez0
+- LinkedIn: https://www.linkedin.com/in/miguel-arbelaez-v-57719542b/
