@@ -1,12 +1,12 @@
 # E-Commerce Flutter
 
-A Flutter e-commerce application built with Dart, BLoC, Dio, Hive, and GetIt, integrating a REST API for product data and local persistence for the shopping cart.
+A Flutter e-commerce application built with Dart, BLoC, Dio, Hive, and GetIt, integrating the Fake Store API for product data and local persistence for the shopping cart.
 
 ## 📱 Overview
 
 ECOMMERCE is a Flutter application that demonstrates the implementation of a mobile shopping experience with product discovery, product details, cart management, and persistent local cart data.
 
-The project focuses on practical Flutter development, reactive state management, API integration, and local persistence.
+The project focuses on practical Flutter development, reactive state management, REST API integration, dependency injection, and local-first cart persistence.
 
 ## 🚀 Features
 
@@ -61,7 +61,6 @@ Local Storage
 | Dio | HTTP client |
 | Hive | Local persistence |
 | GetIt | Dependency injection |
-| Equatable | Value equality |
 | Fake Store API | Product data |
 
 ## 🛍️ Product Catalog
@@ -177,7 +176,9 @@ This project demonstrates practical experience with:
 
 ## 📌 Project Status
 
-The project is a completed academic/personal development project created to practice Flutter application development, API consumption, state management, and local persistence.
+**Completed portfolio project.**
+
+The project was developed to demonstrate Flutter application development, REST API consumption, BLoC state management, dependency injection, local persistence, and client-side e-commerce workflows.
 
 The checkout flow is part of the application interface and does not process real payments or orders.
 
@@ -185,7 +186,7 @@ The checkout flow is part of the application interface and does not process real
 
 **Miguel Arbeláez Vallejo**
 
-Software Developer | Flutter / Dart | Full-Stack Development
+Software Developer | Flutter & Dart | Full-Stack | Backend | AI/Data
 
 - GitHub: https://github.com/MiguelArbelaez0
 - LinkedIn: https://www.linkedin.com/in/miguel-arbelaez-v-57719542b/
