@@ -168,4 +168,4 @@ El flujo de pago es únicamente parte de la interfaz y no procesa pagos ni pedid
 
 **Miguel Arbeláez Vallejo**
 
-Desarrollador de Software | Flutter y Dart | Desarrollo integral | Backend | IA y Datos
+Desarrollador de Software | Flutter y Dart | Desarrollo integral | Servidor | IA y Datos
