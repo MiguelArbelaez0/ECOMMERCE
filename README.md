@@ -1,115 +1,105 @@
 # E-Commerce Flutter
 
-A Flutter e-commerce application built with Dart, BLoC, Dio, Hive, and GetIt, integrating the Fake Store API for product data and local persistence for the shopping cart.
+Aplicación móvil de comercio electrónico desarrollada con Flutter y Dart, utilizando BLoC, Dio, Hive y GetIt, e integrando la API de Fake Store para los productos y persistencia local del carrito.
 
-## 📱 Overview
+## 📱 Descripción general
 
-ECOMMERCE is a Flutter application that demonstrates the implementation of a mobile shopping experience with product discovery, product details, cart management, and persistent local cart data.
+ECOMMERCE es una aplicación Flutter que demuestra una experiencia de compra móvil con catálogo de productos, detalles, carrito y persistencia local.
 
-The project focuses on practical Flutter development, reactive state management, REST API integration, dependency injection, and local-first cart persistence.
+El proyecto se enfoca en desarrollo práctico con Flutter, gestión reactiva de estado, integración con APIs REST, inyección de dependencias y persistencia local.
 
-## 🚀 Features
+## 🚀 Funcionalidades
 
-- Product catalog
-- Product information and details
-- Product data from the Fake Store API
-- Shopping cart
-- Add and remove products from the cart
-- Persistent cart data
-- Reactive state management with BLoC
-- REST API integration
-- Dependency injection
-- Layered application structure
-- Responsive Flutter interface
+- Catálogo de productos.
+- Información y detalles de productos.
+- Productos obtenidos desde Fake Store API.
+- Carrito de compras.
+- Agregar y eliminar productos.
+- Persistencia del carrito.
+- Gestión de estado con BLoC.
+- Integración con API REST.
+- Inyección de dependencias.
+- Organización por capas.
+- Interfaz adaptable.
 
-## 🏗️ Architecture
+## 🏗️ Arquitectura
 
-The application separates presentation, application logic, and external data access.
-
-The main flow can be represented as:
+Flujo principal:
 
 ```text
-Presentation
+Presentación
      ↓
 BLoC
      ↓
-Repository
+Repositorio
      ↓
 Dio
      ↓
 Fake Store API
 ```
 
-Cart persistence is handled locally:
+Persistencia del carrito:
 
 ```text
-Cart State
+Estado del carrito
     ↓
 Hive
     ↓
-Local Storage
+Almacenamiento local
 ```
 
-## 🧩 Technologies
+## 🧩 Tecnologías
 
-| Technology | Usage |
+| Tecnología | Uso |
 |---|---|
-| Flutter | Application framework |
-| Dart | Programming language |
-| flutter_bloc | State management |
-| BLoC | Application state |
-| Dio | HTTP client |
-| Hive | Local persistence |
-| GetIt | Dependency injection |
-| Fake Store API | Product data |
+| Flutter | Desarrollo de la aplicación |
+| Dart | Lenguaje de programación |
+| flutter_bloc | Gestión de estado |
+| BLoC | Estado de la aplicación |
+| Dio | Cliente HTTP |
+| Hive | Persistencia local |
+| GetIt | Inyección de dependencias |
+| Fake Store API | Datos de productos |
 
-## 🛍️ Product Catalog
+## 🛍️ Catálogo
 
-The application retrieves product information from the Fake Store API and presents it through the Flutter interface.
+La aplicación obtiene los productos desde Fake Store API y los presenta mediante la interfaz Flutter.
 
-Product data is obtained through the data layer instead of coupling UI components directly to HTTP requests.
+Los datos se obtienen a través de la capa de datos, evitando acoplar la interfaz directamente a las solicitudes HTTP.
 
-## 🛒 Shopping Cart
+## 🛒 Carrito de compras
 
-The cart allows users to:
+Permite:
 
-- Add products
-- Remove products
-- Review selected products
-- Maintain cart state
-- Persist cart information locally
+- Agregar productos.
+- Eliminar productos.
+- Revisar productos seleccionados.
+- Mantener el estado del carrito.
+- Conservar el carrito entre sesiones.
 
-Hive is used to preserve cart data between application sessions.
+Hive se utiliza para la persistencia local.
 
-## 💾 Local Persistence
+## 💾 Persistencia local
 
-Hive provides local storage for the shopping cart.
+El carrito se almacena localmente para conservar la información después de cerrar y abrir la aplicación.
 
-This allows cart information to remain available after closing and reopening the application without requiring a remote order or payment backend.
+El proyecto se concentra en la experiencia de comercio electrónico del lado del cliente; no implementa pagos reales ni procesamiento de pedidos de producción.
 
-## ⚡ State Management
+## ⚡ Gestión de estado
 
-BLoC is used to manage application state and coordinate changes between the interface and application logic.
+BLoC administra el estado y coordina los cambios entre la interfaz y la lógica de la aplicación.
 
-This keeps UI components focused on presentation while state transitions and operations remain in dedicated logic components.
+## 💉 Inyección de dependencias
 
-## 💉 Dependency Injection
+`GetIt` centraliza el registro y resolución de dependencias, reduciendo el acoplamiento entre componentes.
 
-`GetIt` is used for dependency registration and resolution.
+## 🌐 Integración con la API
 
-This centralizes dependency configuration and reduces direct coupling between application components.
+`Dio` se utiliza como cliente HTTP para comunicarse con Fake Store API.
 
-## 🌐 API Integration
+La API proporciona el catálogo de productos consumido por la aplicación.
 
-The application uses `Dio` as its HTTP client to communicate with the Fake Store API.
-
-The API provides the product catalog consumed by the application.
-
-The project is focused on the client-side e-commerce experience; it does not implement real payment processing or production order fulfillment.
-
-## 📂 Project Structure
-
-The project uses a layered organization to separate responsibilities:
+## 📂 Estructura
 
 ```text
 lib/
@@ -119,74 +109,63 @@ lib/
 └── presentation/
 ```
 
-### Presentation
+### Presentación
+Pantallas, widgets y gestión de estado.
 
-Contains screens, widgets, and BLoC state management.
+### Dominio
+Entidades, lógica de aplicación y abstracciones de repositorio.
 
-### Domain
-
-Contains application entities, business logic, and repository abstractions.
-
-### Data
-
-Contains API communication, models, and repository implementations.
+### Datos
+Comunicación con la API, modelos e implementaciones de repositorios.
 
 ### Core
+Funcionalidades compartidas y utilidades.
 
-Contains shared application functionality and utilities.
+## ⚙️ Instalación
 
-## ⚙️ Installation
-
-### 1. Clone the repository
+### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/MiguelArbelaez0/ECOMMERCE.git
 cd ECOMMERCE
 ```
 
-### 2. Install dependencies
+### 2. Instalar dependencias
 
 ```bash
 flutter pub get
 ```
 
-### 3. Run the application
+### 3. Ejecutar
 
 ```bash
 flutter run
 ```
 
-Make sure Flutter and Dart are correctly installed and configured on your development environment.
+## 🎯 Qué demuestra este proyecto
 
-## 🎯 What This Project Demonstrates
+- Flutter y Dart.
+- Gestión de estado con BLoC.
+- Integración con APIs REST.
+- Dio.
+- Persistencia local con Hive.
+- Inyección de dependencias con GetIt.
+- Gestión de carrito.
+- Interfaces de catálogo.
+- Arquitectura por capas.
+- Separación de responsabilidades.
+- Desarrollo de interfaces adaptables.
 
-This project demonstrates practical experience with:
+## 📌 Estado del proyecto
 
-- Flutter and Dart
-- BLoC state management
-- REST API integration
-- Dio
-- Hive local persistence
-- Dependency injection with GetIt
-- Shopping cart management
-- Product catalog interfaces
-- Layered application architecture
-- Separation of concerns
-- Responsive UI development
+**Proyecto de portafolio terminado.**
 
-## 📌 Project Status
+Desarrollado para demostrar desarrollo móvil con Flutter, consumo de APIs REST, gestión de estado con BLoC, inyección de dependencias, persistencia local y flujo de comercio electrónico del lado del cliente.
 
-**Completed portfolio project.**
+El flujo de pago es únicamente parte de la interfaz y no procesa pagos ni pedidos reales.
 
-The project was developed to demonstrate Flutter application development, REST API consumption, BLoC state management, dependency injection, local persistence, and client-side e-commerce workflows.
-
-The checkout flow is part of the application interface and does not process real payments or orders.
-
-## 👨‍💻 Author
+## 👨‍💻 Autor
 
 **Miguel Arbeláez Vallejo**
 
-Software Developer | Flutter & Dart | Full-Stack | Backend | AI/Data
-
-- GitHub: https://github.com/MiguelArbelaez0
-- LinkedIn: https://www.linkedin.com/in/miguel-arbelaez-v-57719542b/
+Desarrollador de Software | Flutter y Dart | Desarrollo integral | Backend | IA y Datos
