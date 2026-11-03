@@ -169,3 +169,11 @@ El flujo de pago es únicamente parte de la interfaz y no procesa pagos ni pedid
 **Miguel Arbeláez Vallejo**
 
 Flutter & Dart · Full-Stack · Backend · AI/Data
+
+---
+
+## 🔎 Alcance y verificación documental (2026-11-02)
+
+El catálogo se obtiene de Fake Store API y el carrito utiliza Hive. La aplicación es una demostración de cliente móvil: no implementa procesamiento de pagos ni pedidos reales. Hay pruebas de modelos y casos de uso en `test/`, pero no se ha ejecutado la suite en esta auditoría.
+
+**Estado de la revisión:** contraste estático entre documentación, estructura y archivos de configuración/código seleccionados. No se ejecutaron compilaciones, pruebas automatizadas, despliegues ni auditorías dinámicas de seguridad. La documentación describe el alcance observado, sin certificar preparación para producción.
