@@ -1,5 +1,7 @@
 # E-Commerce Flutter
 
+> **Para reclutadores:** Flutter, Dart, BLoC, Dio, Hive y GetIt. Proyecto demostrativo de catálogo y carrito local sin pagos reales. Para revisar la arquitectura: `lib/features/products/`, `lib/features/cart/` y `test/`. No se ha ejecutado una prueba de compilación en esta auditoría.
+
 Aplicación móvil de comercio electrónico desarrollada con Flutter y Dart, utilizando BLoC, Dio, Hive y GetIt, e integrando la API de Fake Store para los productos y persistencia local del carrito.
 
 ## 📱 Descripción general
