@@ -15,6 +15,10 @@ class CartItem extends Equatable {
     required this.quantity,
   });
 
+  int get unitPriceCents => (price * 100).round();
+
+  int get subtotalCents => unitPriceCents * quantity;
+
   CartItem copyWith({
     int? productId,
     String? title,

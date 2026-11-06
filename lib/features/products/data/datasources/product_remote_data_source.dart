@@ -23,6 +23,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       return data
           .map((item) => ProductModel.fromJson(item as Map<String, dynamic>))
           .toList(growable: false);
+    } on FormatException {
+      throw ServerException('The server returned invalid product data.');
+    } on TypeError {
+      throw ServerException('The server returned invalid product data.');
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionError ||
           e.type == DioExceptionType.connectionTimeout ||
@@ -32,9 +36,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
             'Unable to connect. Check your internet connection.');
       }
       throw ServerException(
-        e.response?.data.toString() ??
-            e.message ??
-            'Failed to fetch products from server',
+        'Unable to load products (HTTP ${e.response?.statusCode ?? 'unknown'}). Please retry.',
       );
     }
   }
@@ -45,6 +47,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       final Response<dynamic> response =
           await apiClient.dio.get('/products/$id');
       return ProductModel.fromJson(response.data as Map<String, dynamic>);
+    } on FormatException {
+      throw ServerException('The server returned invalid product data.');
+    } on TypeError {
+      throw ServerException('The server returned invalid product data.');
     } on DioException catch (e) {
       if (e.type == DioExceptionType.connectionError ||
           e.type == DioExceptionType.connectionTimeout ||
@@ -54,9 +60,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
             'Unable to connect. Check your internet connection.');
       }
       throw ServerException(
-        e.response?.data.toString() ??
-            e.message ??
-            'Failed to fetch product details',
+        'Unable to load product details (HTTP ${e.response?.statusCode ?? 'unknown'}). Please retry.',
       );
     }
   }

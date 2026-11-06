@@ -42,3 +42,12 @@ class CartQuantityUpdated extends CartEvent {
   @override
   List<Object?> get props => [productId, quantity];
 }
+
+/// A relative update resolves against the latest persisted state in the queue.
+class CartQuantityChanged extends CartEvent {
+  final int productId;
+  final int delta;
+  const CartQuantityChanged(this.productId, this.delta);
+  @override
+  List<Object?> get props => [productId, delta];
+}
