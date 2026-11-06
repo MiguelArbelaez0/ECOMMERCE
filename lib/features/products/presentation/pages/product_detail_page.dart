@@ -12,10 +12,20 @@ class ProductDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ScaffoldMessenger(
+        child: Scaffold(
       appBar: AppBar(title: const Text('Product Detail')),
-      body: _ProductDetailContent(product: product),
-    );
+      body: BlocListener<CartBloc, CartState>(
+        listener: (context, state) {
+          final message = state.errorMessage ?? state.successMessage;
+          if (message != null) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(message)));
+          }
+        },
+        child: SafeArea(child: _ProductDetailContent(product: product)),
+      ),
+    ));
   }
 }
 
@@ -39,7 +49,11 @@ class _ProductDetailContent extends StatelessWidget {
                   Center(
                     child: SizedBox(
                       height: 240,
-                      child: Image.network(product.image, fit: BoxFit.contain),
+                      child: Image.network(product.image,
+                          fit: BoxFit.contain,
+                          semanticLabel: product.title,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.image_not_supported, size: 64)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -71,26 +85,27 @@ class _ProductDetailContent extends StatelessWidget {
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () {
-                context.read<CartBloc>().add(
-                      CartItemAdded(
-                        CartItem(
-                          productId: product.id,
-                          title: product.title,
-                          price: product.price,
-                          image: product.image,
-                          quantity: 1,
-                        ),
-                      ),
-                    );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Added to cart')),
-                );
-              },
-              icon: const Icon(Icons.add_shopping_cart),
-              label: const Text('Add to cart'),
-            ),
+            child: BlocBuilder<CartBloc, CartState>(
+                builder: (context, state) => FilledButton.icon(
+                      onPressed: state.isLoading
+                          ? null
+                          : () {
+                              context.read<CartBloc>().add(
+                                    CartItemAdded(
+                                      CartItem(
+                                        productId: product.id,
+                                        title: product.title,
+                                        price: product.price,
+                                        image: product.image,
+                                        quantity: 1,
+                                      ),
+                                    ),
+                                  );
+                            },
+                      icon: const Icon(Icons.add_shopping_cart),
+                      label:
+                          Text(state.isLoading ? 'Saving...' : 'Add to cart'),
+                    )),
           ),
         ],
       ),

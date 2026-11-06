@@ -38,6 +38,7 @@ class ProductCard extends StatelessWidget {
                 child: Center(
                   child: Image.network(
                     product.image,
+                    semanticLabel: product.title,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) =>
                         const Icon(Icons.image_not_supported),

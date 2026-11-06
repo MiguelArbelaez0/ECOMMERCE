@@ -26,9 +26,13 @@ class CartItemTile extends StatelessWidget {
         child: Row(
           children: [
             SizedBox(
-              width: 70,
+              width: 48,
               height: 70,
-              child: Image.network(item.image, fit: BoxFit.contain),
+              child: Image.network(item.image,
+                  fit: BoxFit.contain,
+                  semanticLabel: item.title,
+                  errorBuilder: (_, __, ___) =>
+                      const Icon(Icons.image_not_supported)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -39,18 +43,21 @@ class CartItemTile extends StatelessWidget {
                       maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Text(
-                    '\$${item.price.toStringAsFixed(2)}',
+                    'Subtotal: \$${(item.subtotalCents / 100).toStringAsFixed(2)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       IconButton(
                           onPressed: onDecrement,
+                          tooltip: 'Decrease quantity',
                           icon: const Icon(Icons.remove_circle_outline)),
                       Text('${item.quantity}'),
                       IconButton(
                           onPressed: onIncrement,
+                          tooltip: 'Increase quantity',
                           icon: const Icon(Icons.add_circle_outline)),
                     ],
                   ),
@@ -58,7 +65,9 @@ class CartItemTile extends StatelessWidget {
               ),
             ),
             IconButton(
-                onPressed: onRemove, icon: const Icon(Icons.delete_outline)),
+                onPressed: onRemove,
+                tooltip: 'Remove product',
+                icon: const Icon(Icons.delete_outline)),
           ],
         ),
       ),

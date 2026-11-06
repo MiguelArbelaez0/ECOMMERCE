@@ -43,3 +43,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local credentials and integration-test output
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+/test_driver/*.json
