@@ -67,7 +67,7 @@ flutter build apk --debug
 flutter test integration_test/shopping_flow_test.dart -d <device-id>
 ```
 
-Las pruebas unitarias y de widgets utilizan respuestas y repositorios controlados. Las pruebas de archivos Hive usan directorios temporales; no modifican el carrito del usuario. La integración Android utiliza un catálogo HTTP simulado y almacenamiento temporal exclusivo, y comprueba el carrito después de cerrar y reabrir sus dependencias.
+Las pruebas unitarias y de widgets utilizan respuestas y repositorios controlados. Las pruebas de archivos Hive usan directorios temporales; no modifican el carrito del usuario. La integración Android utiliza un catálogo HTTP simulado y almacenamiento temporal exclusivo, y comprueba el carrito después de cerrar y reabrir sus dependencias. Una segunda prueba ejecuta guardado y lectura en procesos Android separados, con almacenamiento exclusivo dentro de documentos; el procedimiento está en [Validación de plataformas](docs/PLATFORM_VALIDATION.md).
 
 ## Resultados verificados
 
@@ -82,10 +82,13 @@ Validación local del 5 de noviembre de 2026:
 | Compilación APK debug | Correcta con JDK 21 aislado |
 | Persistencia Hive en archivos temporales | Reapertura, claves antiguas, concurrencia y corrupción verificadas |
 | API pública, comprobación puntual | HTTP 200 y 20 productos |
-| Revisión visual en Chrome | Pendiente; la herramienta de interacción no pudo completar la inspección |
-| Integración Android | Pendiente de completar en un emulador con espacio suficiente |
+| Chrome funcional y persistencia al recargar/reabrir | Validación manual confirmada por el autor, sin fallos |
+| Integración Android | 3 comprobaciones aprobadas en Android 16/API 36: flujo, guardado y lectura en otro proceso |
+| Persistencia Android entre procesos | Cantidad 3 y total 59.97 conservados en documentos después de cierre completo |
+| Android con catálogo real y revisión visual | Flujo confirmado manualmente por el autor, sin fallos |
+| Carrito habitual Android tras cierre completo | Producto ID 1, cantidad 1 y total 109.95 conservados; archivo e interfaz comprobados |
 
-Los widgets se ejercitaron a 320×640, 800×900 y 1440×900, además de texto al 200 % a 320×740. Estos resultados no sustituyen una revisión visual completa en dispositivos reales. El workflow de GitHub Actions está configurado para formato, análisis, pruebas y compilaciones; aún no se ha ejecutado en remoto.
+Los widgets se ejercitaron a 320×640, 800×900 y 1440×900, además de texto al 200 % a 320×740. Las pruebas Android usan HTTP controlado; la revisión manual de Chrome usa el catálogo real. La integración usa un subdirectorio exclusivo de documentos. Además se comprobó el carrito habitual Android después de cerrar completamente el proceso: su contenido se conservó y el autor lo confirmó en pantalla. El workflow de GitHub Actions está configurado para formato, análisis, pruebas y compilaciones; aún no se ha ejecutado en remoto.
 
 ## Limitaciones
 

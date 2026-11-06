@@ -2,7 +2,7 @@
 
 Fecha: 5 de noviembre de 2026 (America/Bogota).
 
-**Estado: correcciones y comprobaciones locales completadas; aceptación funcional pendiente.** No se declara el proyecto terminado. La revisión visual Chrome y la integración Android requieren completar las verificaciones indicadas abajo. No se ha realizado push, creado PR, fusionado ni eliminado ramas.
+**Estado: validación local completada en Chrome y Android, con persistencia comprobada.** El usuario autorizó publicar improvement/flutter-ecommerce y crear el PR después de pasar Android. CI remoto se comprobará tras publicar. La fusión y la eliminación de ramas continúan pendientes de autorización explícita. Este informe distingue pruebas automatizadas, revisión manual y compilaciones.
 
 ## 1. Estado inicial de Git
 
@@ -71,7 +71,15 @@ No se añadieron capas, servicios de pago ni abstracciones de infraestructura qu
 
 Se detectaron y corrigieron fallos durante las iteraciones de desarrollo: errores duplicados internos de Hive al abrir archivos dañados, dependencia del contexto asíncrono en fixtures de widgets, desplazamiento necesario para tocar chips fuera de pantalla y snackbar que bloqueaba el checkout tras navegar. Las ejecuciones finales afectadas se repitieron y pasaron.
 
-Android: **0 cuerpos de prueba de integración ejecutados**. El primer `flutter test integration_test/... -d emulator-5554` terminó con **1 error de carga** por instalación fallida. Un intento posterior con `flutter drive` y binario precompilado tampoco consiguió instalar; sus tres reintentos automáticos no son tres pruebas. No se contabilizan como pruebas aprobadas.
+Android, resultados actuales: **3 comprobaciones aprobadas, 0 fallidas en las ejecuciones finales**:
+
+1. `shopping_flow_test.dart`: flujo de compra completo y reapertura de Hive en el mismo proceso, 1 aprobada.
+2. `process_restart_test.dart`, fase seed: guarda producto con cantidad 3 y total 59.97, 1 aprobada.
+3. `process_restart_test.dart`, fase verify: recupera esos valores en una nueva ejecución después de cierre completo, 1 aprobada.
+
+La validación usa el AVD independiente `EcommerceValidation`, Android 16/API 36, ID `emulator-5556`, con 4.9 GB libres inicialmente. Se conservaron los datos del AVD original `emulator-5554`, que tiene 340 MB libres. Para la prueba entre procesos se usó el identificador `run20261105_docs_2b3f002`, `--no-uninstall` y un subdirectorio exclusivo de documentos. Después de `am force-stop`, no existía PID de la app; el archivo `app_flutter/ecommerce_restart_run20261105_docs_2b3f002/cart_box.hive` seguía presente con 288 bytes. La fase verify comprobó en la interfaz producto, cantidad y total.
+
+Incidentes anteriores: la primera sesión no llegó a ejecutar la integración por falta de espacio del AVD original. En esta sesión, una primera versión del nuevo fixture guardaba en `Directory.systemTemp`, resuelto como `code_cache`; Android borró ese caché al instalar el segundo APK y falló la fase verify (1 prueba). Se corrigió el fixture para usar documentos mediante path_provider, se exigió que el archivo existiera antes de verify y se repitieron ambas fases satisfactoriamente. No se atribuye ese fallo del fixture al carrito habitual de la aplicación.
 
 ## 7. Análisis y formato
 
@@ -83,9 +91,13 @@ Android: **0 cuerpos de prueba de integración ejecutados**. El primer `flutter 
 
 Entorno observado: Flutter 3.47.5, Dart 3.13.4, Windows 11. La ruta del SDK se llama `C:/Flutter 3.38.7`, pero la versión informada por la herramienta es 3.47.5.
 
-## 8. Compilación web
+## 8. Compilación web y Chrome
 
-`flutter build web`: correcta; salida `build/web`. También se lanzó `flutter run -d chrome --release --web-port 8351`. El lanzamiento y la compilación no constituyen una comprobación funcional visual. Web usa Hive/IndexedDB; no se confirmó persistencia tras recargar Chrome.
+`flutter build web`: correcta, repetida en esta sesión; salida `build/web`.
+
+Se ejecutó `flutter run -d chrome --web-port 8352`. Computer Use no pudo identificar con confianza la URL y detuvo la inspección automatizada. Se entregó al usuario la URL `http://localhost:8352` y una secuencia para catálogo real, categoría, detalle, agregado, incremento/decremento, subtotales/total, checkout, recarga y cierre/reapertura conservando cantidad 2.
+
+El usuario confirmó textualmente **“SIN NINGUN FALLO”** a esa secuencia. Se registra como **validación manual por el autor**, no como inspección visual independiente del agente. Incluye persistencia web al recargar y reabrir según la comprobación solicitada; no se deduce de una compilación.
 
 ## 9. Compilación Android
 
@@ -95,6 +107,8 @@ El primer intento falló porque Flutter eligió Java 25.0.3, incompatible con Gr
 
 Flutter doctor también informó ausencia de cmdline-tools y estado desconocido de licencias Android; las compilaciones debug pudieron completarse con el SDK instalado.
 
+Se repitió además la compilación debug en esta sesión y se instalaron los APK de integración en el AVD temporal.
+
 No se validó APK release. La firma release del proyecto sigue siendo debug y está documentada como pendiente para distribución. Flutter advierte que dejará de soportar las versiones actuales de las herramientas Android en una versión futura.
 
 ## 10. Pruebas funcionales realizadas
@@ -103,7 +117,7 @@ Automatizadas con dependencias controladas: catálogo, filtros, detalle, regreso
 
 HTTP controlado: catálogo vacío, detalle, precios enteros, HTTP 400/404/429/500/503, errores de conexión, timeouts de conexión/envío/recepción, JSON malformado y reintentos. Se verificaron respuestas concurrentes fuera de orden entre catálogo y detalle.
 
-API pública: consulta puntual a `https://fakestoreapi.com/products`, HTTP 200 y 20 productos. No se usa esa API como dependencia de las pruebas. No se afirma haber navegado visualmente por ese catálogo en Chrome o Android.
+API pública: consulta puntual a `https://fakestoreapi.com/products`, HTTP 200 y 20 productos. No se usa esa API como dependencia de las pruebas. La navegación de Chrome con ese catálogo fue confirmada manualmente por el usuario. Android se ejercitó de forma automatizada con catálogo controlado y también mediante la aplicación normal con catálogo real. El usuario confirmó el flujo manual con “FUNCIONA CORECTAMETNE TODO”.
 
 ## 11. Persistencia Hive comprobada
 
@@ -116,18 +130,20 @@ Las pruebas ejecutadas usan archivos reales en directorios temporales propios:
 - Errores de acceso a caja cerrada traducidos a fallo de caché y posterior recuperación.
 - Archivo físicamente dañado: apertura rechazada y bytes idénticos antes y después, sin truncado automático.
 
-Esto valida el origen local y su contrato en el host; no equivale a matar y reiniciar el proceso Android ni a recargar el navegador. Esas dos comprobaciones siguen pendientes.
+Además de las pruebas del host, se ejecutaron las dos fases Android descritas en la sección 6 con el mismo esquema de Hive y almacenamiento bajo documentos, en procesos separados. El directorio pertenece solo a la prueba y no al carrito habitual. La recarga/reapertura de Chrome fue confirmada por el usuario. También se comprobó el carrito habitual de la aplicación Android, sin sustituir datos ni usar la ruta del fixture: el usuario agregó un producto real. Se extrajeron copias de solo lectura de `app_flutter/cart_box.hive` y se decodificaron en memoria con el mismo adaptador. Antes y después de `am force-stop` y `am start` contenían producto ID 1, cantidad 1, subtotal y total 10995 centavos (109.95). El PID anterior era 4095, quedó ausente al cerrar y el nuevo proceso fue 4343. El usuario confirmó en pantalla: “EL CARRITO LO PERSISTE AHI SIGUE”. Las copias se conservaron fuera del repositorio; no se modificó el almacenamiento para realizar la comprobación.
 
-## 12. Limitaciones pendientes y validación manual
+Una primera consulta manual se hizo con carrito vacío; por eso no se contabilizó como evidencia de persistencia de productos y se repitió con datos.
 
-1. Chrome: completar catálogo real, categorías, detalle, carrito, cantidades, total, reintento y recarga manteniendo el carrito. Computer Use se detuvo automáticamente porque no pudo identificar la URL del navegador con confianza suficiente para aplicar su política.
-2. Android: liberar espacio por decisión del usuario o proporcionar un emulador/dispositivo con espacio. El existente tiene una partición de datos de 5.8 GB con 340 MB libres y rechazó el APK por falta de almacenamiento. No se borraron datos para conseguir espacio.
-3. Un intento de emulador temporal falló por el límite de `partition-size` de esa versión. La ejecución de un intento corregido fue rechazada por la política automática (`blocked by policy`), sin motivo más específico. No se insistió en esa operación.
-4. Ejecutar la integración incluida y comprobar además cierre forzado/reinicio Android con carrito persistido, y aspecto visual real en ambas plataformas.
-5. CI remoto pendiente: el workflow solo existe localmente hasta autorizar push. No se afirma que sus jobs hayan pasado en GitHub.
-6. Datos incompatibles o corruptos requieren recuperación explícita desde respaldo; se prioriza preservarlos. No se han supuesto formatos históricos no documentados.
-7. Sin cobros, pedidos, backend propio, autenticación, inventario, impuestos, catálogo offline ni localización completa. Precios con símbolo `$`, sin conversión de moneda. El carrito no está cifrado y no guarda datos de pago.
-8. La búsqueda por patrones no detectó claves privadas, AWS access keys, Google API keys o tokens GitHub en archivos versionados; tampoco hay archivos locales de firma/secretos versionados. Esta comprobación no sustituye un análisis especializado del historial ni prueba ausencia absoluta de secretos o vulnerabilidades de dependencias.
+## 12. Limitaciones pendientes y procedimiento
+
+1. Chrome y Android: los flujos con datos reales fueron confirmados manualmente por el autor. El agente ejecutó las pruebas y comprobó el contenido persistido, pero no completó una inspección visual independiente mediante Computer Use. La evidencia manual se atribuye expresamente al usuario.
+2. CI de GitHub pendiente de ejecución tras la publicación ya autorizada. El workflow tiene permisos de solo lectura, acciones fijadas a SHA, Flutter 3.47.5 y JDK 21. La etiqueta Flutter 3.47.5 existe en el repositorio oficial y coincide con el SDK local. No se afirma que el workflow haya pasado en remoto.
+3. El AVD original conserva todos sus datos y sigue corto de espacio. Se creó un AVD temporal independiente copiando solo la configuración y usando imágenes nuevas; no se borró ningún AVD ni se desinstalaron apps del usuario para conseguir espacio.
+4. Computer Use se detuvo por su control de identificación de URL; no se insistió con otra vía de interacción del navegador. El flujo Chrome se validó manualmente con el usuario.
+5. Hay instrucciones reproducibles en `docs/PLATFORM_VALIDATION.md`, tanto para las comprobaciones manuales como para las dos fases de reinicio Android. Usar IDs de dispositivo explícitos y conservar instalada la aplicación entre seed y verify.
+6. Se mantienen las limitaciones funcionales de la demo: sin pagos/pedidos reales, autenticación, inventario, impuestos, catálogo offline ni localización completa. El carrito no está cifrado y no guarda información de pago.
+7. Datos corruptos/incompatibles se preservan y requieren recuperación explícita desde respaldo. No se han supuesto formatos históricos no documentados.
+8. La búsqueda por patrones no detectó claves privadas, AWS access keys, Google API keys o tokens GitHub en archivos versionados; no hay archivos locales de firma/secretos versionados. No equivale a un análisis especializado del historial o de vulnerabilidades de dependencias.
 
 ## 13. Archivos modificados o añadidos
 
@@ -138,7 +154,9 @@ Esto valida el origen local y su contrato en el host; no equivale a matar y rein
 - `android/app/src/main/AndroidManifest.xml`
 - `android/gradle.properties`
 - `docs/VERIFICATION_REPORT.md`
+- `docs/PLATFORM_VALIDATION.md`
 - `integration_test/shopping_flow_test.dart`
+- `integration_test/process_restart_test.dart`
 - `lib/core/network/api_client.dart`
 - `lib/core/storage/open_box.dart`
 - `lib/features/cart/data/datasources/cart_local_data_source.dart`
@@ -172,17 +190,26 @@ Esto valida el origen local y su contrato en el host; no equivale a matar y rein
 - `web/index.html`
 - `web/manifest.json`
 
-## 14. Commits creados
+## 14. Commits y cambios de seguimiento
 
-- `daaf30d` — `fix: serialize cart persistence and protect asynchronous state`
-- `6b78c73` — `feat: improve responsive shopping flows and enable web builds`
-- `18d9cb0` — `test: cover cart storage, request races and shopping flows`
-- El commit de documentación que contiene este informe: `docs: document verified setup and remaining platform checks`. Su hash se obtiene con `git log --oneline origin/main..HEAD` y se entrega en el informe final del chat para no incluir una referencia circular al propio commit.
+Commits originales: `daaf30d` (persistencia y estados), `6b78c73` (interfaz/web), `18d9cb0` (pruebas/CI), `ee76d80` (documentación).
 
-## 15. Estado final de la rama
+El seguimiento añade una prueba de persistencia entre procesos Android, declara path_provider como dependencia directa de desarrollo sin cambiar su versión resuelta, y actualiza resultados y procedimientos. Los hashes definitivos se consultan con `git log --oneline main..improvement/flutter-ecommerce` antes de la fusión.
 
-Trabajo limitado a `improvement/flutter-ecommerce`, basada en `8625801`. `main` se dejó en el fast-forward sincronizado con el remoto consultado. No hay cambios en las ramas remotas, push, PR, merge ni eliminación de ramas. El cierre de entrega incluye comprobar que el árbol quede limpio después del commit de documentación.
+Nuevo commit de pruebas: `d73aba8` — `test: verify Hive persistence across Android processes`.
+
+No se introdujeron cambios adicionales de lógica de producción en esta revisión: la nueva evidencia procede de ejecutar las rutas existentes en Android y validar Chrome con el usuario.
+
+## 15. Revisión de ramas y condiciones de integración
+
+Base de entrega: `8625801`. La rama de trabajo es `improvement/flutter-ecommerce`; main y origin/main continúan sincronizadas con esa base en la última consulta.
+
+`git ls-remote --heads origin` y el conector GitHub confirman cuatro ramas remotas: main, mejoras y las dos codex. Ambas codex son antecesoras de main. `1838501` de mejoras es el único nodo exclusivo: `git diff origin/main...origin/mejoras` y el diff respecto de su segundo padre están vacíos; es descartable por contenido, no una mejora perdida.
+
+El usuario autorizó publicar la rama y crear el PR después de pasar Android. La secuencia es publicar, crear/revisar el PR, comprobar CI del commit propuesto y solicitar autorización explícita para fusionar. La eliminación de ramas requiere autorización y comprobación posterior a la fusión. No se ha efectuado ninguna de esas mutaciones remotas en este punto. El resultado Git definitivo se comprueba mediante status, log, branch -a y listado de GitHub, no se presupone en el informe.
 
 ## 16. Recomendación técnica
 
-Los cambios están organizados para revisión de código y las comprobaciones locales de análisis, pruebas y compilación pasan. **No se recomienda marcar el proyecto terminado ni aprobar su fusión todavía.** Primero deben completarse las comprobaciones funcionales de Chrome y Android, incluyendo reinicio real y persistencia, y ejecutar CI en remoto cuando se autorice el push. Un PR puede servir para revisión cuando el usuario lo autorice, manteniendo visibles estas verificaciones pendientes.
+Formato, análisis, 38 pruebas unitarias/widgets y compilaciones web/APK pasan. El flujo de Chrome fue confirmado sin fallos por el usuario y las 3 comprobaciones Android controladas pasan, incluida persistencia entre procesos.
+
+Android con datos reales y persistencia habitual ya fueron confirmados. La rama está preparada para publicación y PR con autorización concedida. Antes de fusionar deben pasar los controles de CI del commit propuesto y obtenerse autorización explícita; la limpieza también requiere autorización. No se declara aún alcanzado el estado final de una sola rama main.
