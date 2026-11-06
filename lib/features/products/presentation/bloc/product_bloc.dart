@@ -9,6 +9,7 @@ part 'product_event.dart';
 part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
+  int _requestVersion = 0;
   final GetProducts getProducts;
   final GetProductById getProductById;
 
@@ -22,8 +23,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     ProductsRequested event,
     Emitter<ProductState> emit,
   ) async {
+    final version = ++_requestVersion;
     emit(const ProductLoading());
     final result = await getProducts();
+    if (emit.isDone || version != _requestVersion) return;
     result.fold(
       (failure) => emit(ProductError(failure.message)),
       (products) => emit(ProductsLoaded(products)),
@@ -34,8 +37,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     ProductDetailRequested event,
     Emitter<ProductState> emit,
   ) async {
+    final version = ++_requestVersion;
     emit(const ProductLoading());
     final result = await getProductById(event.id);
+    if (emit.isDone || version != _requestVersion) return;
     result.fold(
       (failure) => emit(ProductError(failure.message)),
       (product) => emit(ProductDetailLoaded(product)),

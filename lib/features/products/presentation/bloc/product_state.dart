@@ -18,7 +18,8 @@ class ProductLoading extends ProductState {
 class ProductsLoaded extends ProductState {
   final List<Product> products;
 
-  const ProductsLoaded(this.products);
+  ProductsLoaded(List<Product> products)
+      : products = List.unmodifiable(products);
 
   @override
   List<Object?> get props => [products];

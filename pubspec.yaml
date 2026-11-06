@@ -1,5 +1,5 @@
 name: ecommerce_clean_app
-description: Production-ready e-commerce Flutter app with Clean Architecture, BLoC, Dio, and Hive.
+description: Demo e-commerce app with a REST catalog and a locally persisted cart.
 publish_to: none
 version: 1.0.0+1
 
@@ -18,6 +18,9 @@ dependencies:
   get_it: ^8.2.0
 
 dev_dependencies:
+  path_provider: ^2.1.5
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0

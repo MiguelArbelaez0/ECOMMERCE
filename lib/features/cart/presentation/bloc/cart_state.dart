@@ -4,15 +4,19 @@ class CartState extends Equatable {
   final List<CartItem> items;
   final bool isLoading;
   final String? errorMessage;
+  final String? successMessage;
 
-  const CartState({
-    this.items = const [],
+  CartState({
+    List<CartItem> items = const [],
     this.isLoading = false,
     this.errorMessage,
-  });
+    this.successMessage,
+  }) : items = List.unmodifiable(items);
 
-  double get totalPrice =>
-      items.fold<double>(0, (sum, item) => sum + item.price * item.quantity);
+  int get totalCents =>
+      items.fold<int>(0, (sum, item) => sum + item.subtotalCents);
+
+  double get totalPrice => totalCents / 100;
 
   CartState copyWith({
     List<CartItem>? items,
@@ -27,5 +31,5 @@ class CartState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [items, isLoading, errorMessage];
+  List<Object?> get props => [items, isLoading, errorMessage, successMessage];
 }

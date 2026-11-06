@@ -18,6 +18,18 @@ class ProductModel {
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
+    final price = json['price'];
+    if (json['id'] is! int ||
+        (json['id'] as int) <= 0 ||
+        price is! num ||
+        !price.isFinite ||
+        price < 0 ||
+        price > 1000000000 ||
+        ['title', 'description', 'category', 'image']
+            .any((key) => json[key] is! String) ||
+        (json['title'] as String).trim().isEmpty) {
+      throw const FormatException('Invalid product data');
+    }
     return ProductModel(
       id: json['id'] as int,
       title: json['title'] as String,

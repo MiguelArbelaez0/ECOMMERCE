@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/error/failures.dart';
+import '../../../../core/utils/either.dart';
 import '../../domain/entities/cart_item.dart';
 import '../../domain/usecases/add_to_cart.dart';
 import '../../domain/usecases/clear_cart.dart';
@@ -24,57 +26,54 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     required this.removeFromCart,
     required this.updateCartQuantity,
     required this.clearCart,
-  }) : super(const CartState(isLoading: true)) {
-    on<CartStarted>(_onStarted);
-    on<CartItemAdded>(_onItemAdded);
-    on<CartItemRemoved>(_onItemRemoved);
-    on<CartQuantityUpdated>(_onQuantityUpdated);
-    on<CartCleared>(_onCartCleared);
+  }) : super(CartState(isLoading: true)) {
+    // A single event bucket preserves ordering across all cart event types.
+    on<CartEvent>(_onEvent,
+        transformer: (events, mapper) => events.asyncExpand(mapper));
   }
 
-  Future<void> _onStarted(CartStarted event, Emitter<CartState> emit) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
+  Future<void> _onEvent(CartEvent event, Emitter<CartState> emit) async {
+    emit(state.copyWith(isLoading: true));
+    if (event is CartStarted) {
+      await _load(emit);
+      return;
+    }
+    final Either<Failure, void> result;
+    if (event is CartItemAdded) {
+      result = await addToCart(event.item);
+    } else if (event is CartItemRemoved) {
+      result = await removeFromCart(event.productId);
+    } else if (event is CartQuantityUpdated) {
+      result = await updateCartQuantity(event.productId, event.quantity);
+    } else if (event is CartQuantityChanged) {
+      final item =
+          state.items.where((i) => i.productId == event.productId).firstOrNull;
+      if (item == null) {
+        emit(state.copyWith(isLoading: false));
+        return;
+      }
+      result = await updateCartQuantity(
+          event.productId, item.quantity + event.delta);
+    } else if (event is CartCleared) {
+      result = await clearCart();
+    } else {
+      emit(state.copyWith(isLoading: false));
+      return;
+    }
+    await result.fold(
+      (failure) async =>
+          emit(state.copyWith(isLoading: false, errorMessage: failure.message)),
+      (_) =>
+          _load(emit, message: event is CartItemAdded ? 'Added to cart' : null),
+    );
+  }
+
+  Future<void> _load(Emitter<CartState> emit, {String? message}) async {
     final result = await getCartItems();
     result.fold(
       (failure) =>
           emit(state.copyWith(isLoading: false, errorMessage: failure.message)),
-      (items) => emit(CartState(items: items, isLoading: false)),
-    );
-  }
-
-  Future<void> _onItemAdded(
-      CartItemAdded event, Emitter<CartState> emit) async {
-    final result = await addToCart(event.item);
-    await result.fold(
-      (failure) async => emit(state.copyWith(errorMessage: failure.message)),
-      (_) async => add(const CartStarted()),
-    );
-  }
-
-  Future<void> _onItemRemoved(
-      CartItemRemoved event, Emitter<CartState> emit) async {
-    final result = await removeFromCart(event.productId);
-    await result.fold(
-      (failure) async => emit(state.copyWith(errorMessage: failure.message)),
-      (_) async => add(const CartStarted()),
-    );
-  }
-
-  Future<void> _onQuantityUpdated(
-      CartQuantityUpdated event, Emitter<CartState> emit) async {
-    final result = await updateCartQuantity(event.productId, event.quantity);
-    await result.fold(
-      (failure) async => emit(state.copyWith(errorMessage: failure.message)),
-      (_) async => add(const CartStarted()),
-    );
-  }
-
-  Future<void> _onCartCleared(
-      CartCleared event, Emitter<CartState> emit) async {
-    final result = await clearCart();
-    result.fold(
-      (failure) => emit(state.copyWith(errorMessage: failure.message)),
-      (_) => emit(const CartState()),
+      (items) => emit(CartState(items: items, successMessage: message)),
     );
   }
 }

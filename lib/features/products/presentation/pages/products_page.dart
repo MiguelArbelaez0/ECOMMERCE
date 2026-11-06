@@ -17,18 +17,8 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
   String _selectedCategory = 'Todas';
-  bool _isFiltering = false;
-
-  Future<void> _onCategorySelected(String category) async {
-    if (_selectedCategory == category) return;
-    setState(() {
-      _isFiltering = true;
-      _selectedCategory = category;
-    });
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-    if (mounted) {
-      setState(() => _isFiltering = false);
-    }
+  void _onCategorySelected(String category) {
+    setState(() => _selectedCategory = category);
   }
 
   @override
@@ -45,6 +35,7 @@ class _ProductsPageState extends State<ProductsPage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.shopping_cart_outlined),
+                    tooltip: 'Open cart',
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute<void>(
@@ -101,23 +92,24 @@ class _ProductsPageState extends State<ProductsPage> {
               'Todas',
               ...state.products.map((e) => e.category)
             }.toList();
-            final filteredProducts = _selectedCategory == 'Todas'
+            final selectedCategory = categories.contains(_selectedCategory)
+                ? _selectedCategory
+                : 'Todas';
+            final filteredProducts = selectedCategory == 'Todas'
                 ? state.products
                 : state.products
-                    .where((p) => p.category == _selectedCategory)
+                    .where((p) => p.category == selectedCategory)
                     .toList();
 
             return Column(
               children: [
                 _CategoryChips(
                   categories: categories,
-                  selectedCategory: _selectedCategory,
+                  selectedCategory: selectedCategory,
                   onCategorySelected: _onCategorySelected,
                 ),
                 Expanded(
-                  child: _isFiltering
-                      ? const Center(child: CircularProgressIndicator())
-                      : _ProductsGrid(products: filteredProducts),
+                  child: _ProductsGrid(products: filteredProducts),
                 ),
               ],
             );
@@ -175,28 +167,32 @@ class _ProductsGrid extends StatelessWidget {
       return const Center(child: Text('No products found in this category'));
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: products.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.68,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-      ),
-      itemBuilder: (context, index) {
-        final product = products[index];
-        return ProductCard(
-          product: product,
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => ProductDetailPage(product: product),
-              ),
-            );
-          },
-        );
-      },
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      final columns = (constraints.maxWidth / 240).floor().clamp(1, 6);
+      return GridView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: products.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: columns,
+          mainAxisExtent:
+              340 * MediaQuery.textScalerOf(context).scale(1).clamp(1, 1.8),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+        ),
+        itemBuilder: (context, index) {
+          final product = products[index];
+          return ProductCard(
+            product: product,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ProductDetailPage(product: product),
+                ),
+              );
+            },
+          );
+        },
+      );
+    });
   }
 }

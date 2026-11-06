@@ -8,8 +8,7 @@ import 'features/products/presentation/pages/products_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initDependencies();
-  runApp(const EcommerceApp());
+  runApp(const StartupApp());
 }
 
 class EcommerceApp extends StatelessWidget {
@@ -38,4 +37,47 @@ class EcommerceApp extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A storage failure is recoverable without deleting or replacing the cart.
+class StartupApp extends StatefulWidget {
+  const StartupApp({super.key});
+  @override
+  State<StartupApp> createState() => _StartupAppState();
+}
+
+class _StartupAppState extends State<StartupApp> {
+  late Future<void> _initialization = initDependencies();
+  @override
+  Widget build(BuildContext context) => FutureBuilder<void>(
+        future: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              !snapshot.hasError) {
+            return const EcommerceApp();
+          }
+          return MaterialApp(
+            home: Scaffold(
+                body: Center(
+                    child: snapshot.hasError
+                        ? Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                    'Unable to open cart storage. Your stored data has been preserved.',
+                                    textAlign: TextAlign.center),
+                                const SizedBox(height: 16),
+                                FilledButton(
+                                    onPressed: () => setState(() {
+                                          _initialization = initDependencies();
+                                        }),
+                                    child: const Text('Retry')),
+                              ],
+                            ))
+                        : const CircularProgressIndicator())),
+          );
+        },
+      );
 }

@@ -15,101 +15,111 @@ abstract class CartLocalDataSource {
   Future<void> clearCart();
 }
 
+/// Serializes reads and writes through one queue, including after failures.
+/// Keeps the original Hive keys and adapter schema; never rewrites legacy data.
 class CartLocalDataSourceImpl implements CartLocalDataSource {
   final Box<CartItemModel> box;
+  Future<void> _pending = Future<void>.value();
 
   CartLocalDataSourceImpl(this.box);
 
-  @override
-  Future<List<CartItemModel>> getCartItems() async {
-    try {
-      return box.values.toList(growable: false);
-    } catch (e) {
-      throw CacheException('Could not load cart items');
+  Future<T> _serialized<T>(Future<T> Function() operation) {
+    final result = _pending.then((_) => operation());
+    _pending = result.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    return result;
+  }
+
+  void _validate(CartItemModel item) {
+    if (item.productId <= 0 ||
+        item.title.trim().isEmpty ||
+        !item.price.isFinite ||
+        item.price < 0 ||
+        item.price > 1000000000 ||
+        item.quantity < 1 ||
+        item.quantity > 9999) {
+      throw CacheException('Cart data is invalid. Stored data was preserved.');
     }
   }
 
-  @override
-  Future<void> addToCart(CartItemModel item) async {
-    try {
-      final existingKey = box.keys.cast<dynamic>().firstWhere(
-            (key) => box.get(key)?.productId == item.productId,
-            orElse: () => null,
-          );
-
-      if (existingKey != null) {
-        final existing = box.get(existingKey)!;
-        await box.put(
-          existingKey,
-          CartItemModel(
-            productId: existing.productId,
-            title: existing.title,
-            price: existing.price,
-            image: existing.image,
-            quantity: existing.quantity + item.quantity,
-          ),
-        );
-      } else {
-        await box.add(item);
+  List<CartItemModel> _read() {
+    final items = box.values.toList(growable: false);
+    final ids = <int>{};
+    for (final item in items) {
+      _validate(item);
+      if (!ids.add(item.productId)) {
+        throw CacheException('Duplicate cart data. Stored data was preserved.');
       }
-    } catch (e) {
-      throw CacheException('Could not add item to cart');
     }
+    return items;
+  }
+
+  Future<T> _guard<T>(Future<T> Function() operation) => _serialized(() async {
+        try {
+          return await operation();
+        } on CacheException {
+          rethrow;
+        } catch (_) {
+          throw CacheException('Unable to access cart storage. Please retry.');
+        }
+      });
+
+  dynamic _key(int id) {
+    for (final key in box.keys) {
+      if (box.get(key)?.productId == id) return key;
+    }
+    return null;
   }
 
   @override
-  Future<void> removeFromCart(int productId) async {
-    try {
-      final key = box.keys.cast<dynamic>().firstWhere(
-            (k) => box.get(k)?.productId == productId,
-            orElse: () => null,
-          );
-      if (key != null) {
-        await box.delete(key);
-      }
-    } catch (e) {
-      throw CacheException('Could not remove item from cart');
-    }
-  }
+  Future<List<CartItemModel>> getCartItems() => _guard(() async => _read());
 
   @override
-  Future<void> updateQuantity(int productId, int quantity) async {
-    try {
-      final key = box.keys.cast<dynamic>().firstWhere(
-            (k) => box.get(k)?.productId == productId,
-            orElse: () => null,
-          );
-      if (key == null) {
-        return;
-      }
-
-      if (quantity <= 0) {
-        await box.delete(key);
-        return;
-      }
-
-      final current = box.get(key)!;
-      await box.put(
-        key,
-        CartItemModel(
-          productId: current.productId,
-          title: current.title,
-          price: current.price,
-          image: current.image,
-          quantity: quantity,
-        ),
-      );
-    } catch (e) {
-      throw CacheException('Could not update cart quantity');
-    }
-  }
+  Future<void> addToCart(CartItemModel item) => _guard(() async {
+        _validate(item);
+        _read();
+        final key = _key(item.productId);
+        if (key == null) {
+          await box.add(item);
+        } else {
+          final current = box.get(key)!;
+          final updated = CartItemModel.fromEntity(current.toEntity().copyWith(
+                quantity: current.quantity + item.quantity,
+              ));
+          _validate(updated);
+          await box.put(key, updated);
+        }
+      });
 
   @override
-  Future<void> clearCart() async {
-    try {
-      await box.clear();
-    } catch (_) {
-      throw CacheException('Could not clear cart');
-    }
-  }
+  Future<void> removeFromCart(int productId) => _guard(() async {
+        _read();
+        final key = _key(productId);
+        if (key != null) await box.delete(key);
+      });
+
+  @override
+  Future<void> updateQuantity(int productId, int quantity) => _guard(() async {
+        if (quantity < 0 || quantity > 9999) {
+          throw CacheException('Quantity must be between 0 and 9999.');
+        }
+        _read();
+        final key = _key(productId);
+        if (key == null) return;
+        if (quantity == 0) {
+          await box.delete(key);
+        } else {
+          final current = box.get(key)!;
+          await box.put(
+              key,
+              CartItemModel.fromEntity(
+                current.toEntity().copyWith(quantity: quantity),
+              ));
+        }
+      });
+
+  @override
+  Future<void> clearCart() => _guard(() async {
+        _read();
+        await box.clear();
+      });
 }

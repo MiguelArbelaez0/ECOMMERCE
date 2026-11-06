@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../core/network/api_client.dart';
+import '../core/storage/open_box.dart';
 import '../features/cart/data/datasources/cart_local_data_source.dart';
 import '../features/cart/data/models/cart_item_model.dart';
 import '../features/cart/data/repositories/cart_repository_impl.dart';
@@ -21,18 +22,23 @@ import '../features/products/presentation/bloc/product_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
 
-Future<void> initDependencies() async {
+Future<void> initDependencies({String? storagePath}) async {
   if (getIt.isRegistered<ApiClient>()) return;
 
-  await Hive.initFlutter();
+  if (storagePath == null) {
+    await Hive.initFlutter();
+  } else {
+    Hive.init(storagePath);
+  }
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(CartItemModelAdapter());
   }
-  final cartBox = await Hive.openBox<CartItemModel>('cart_box');
+  final cartBox = await openBoxSafely<CartItemModel>('cart_box');
 
-  getIt
-      .registerLazySingleton<ApiClient>(() => ApiClient(ApiClient.createDio()));
-  getIt.registerLazySingleton<Box<CartItemModel>>(() => cartBox);
+  getIt.registerLazySingleton<ApiClient>(() => ApiClient(ApiClient.createDio()),
+      dispose: (client) => client.dio.close());
+  getIt.registerSingleton<Box<CartItemModel>>(cartBox,
+      dispose: (box) => box.close());
 
   getIt.registerLazySingleton<ProductRemoteDataSource>(
     () => ProductRemoteDataSourceImpl(getIt<ApiClient>()),

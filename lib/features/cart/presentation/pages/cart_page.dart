@@ -20,14 +20,28 @@ class CartPage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<CartBloc, CartState>(
+      body: SafeArea(child: BlocBuilder<CartBloc, CartState>(
         builder: (context, state) {
-          if (state.isLoading) {
+          if (state.isLoading && state.items.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
 
           if (state.errorMessage != null) {
-            return Center(child: Text(state.errorMessage!));
+            return Center(
+                child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(state.errorMessage!, textAlign: TextAlign.center),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                            onPressed: () => context
+                                .read<CartBloc>()
+                                .add(const CartStarted()),
+                            child: const Text('Retry')),
+                      ],
+                    )));
           }
 
           if (state.items.isEmpty) {
@@ -36,6 +50,7 @@ class CartPage extends StatelessWidget {
 
           return Column(
             children: [
+              if (state.isLoading) const LinearProgressIndicator(),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -47,14 +62,12 @@ class CartPage extends StatelessWidget {
                       onRemove: () => context
                           .read<CartBloc>()
                           .add(CartItemRemoved(item.productId)),
-                      onIncrement: () => context.read<CartBloc>().add(
-                          CartQuantityUpdated(
-                              productId: item.productId,
-                              quantity: item.quantity + 1)),
-                      onDecrement: () => context.read<CartBloc>().add(
-                          CartQuantityUpdated(
-                              productId: item.productId,
-                              quantity: item.quantity - 1)),
+                      onIncrement: () => context
+                          .read<CartBloc>()
+                          .add(CartQuantityChanged(item.productId, 1)),
+                      onDecrement: () => context
+                          .read<CartBloc>()
+                          .add(CartQuantityChanged(item.productId, -1)),
                     );
                   },
                 ),
@@ -65,8 +78,10 @@ class CartPage extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Wrap(
+                  spacing: 16,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.spaceBetween,
                   children: [
                     Text(
                       'Total: \$${state.totalPrice.toStringAsFixed(2)}',
@@ -75,14 +90,29 @@ class CartPage extends StatelessWidget {
                           ),
                     ),
                     FilledButton(
-                        onPressed: () {}, child: const Text('Checkout')),
+                        onPressed: state.isLoading
+                            ? null
+                            : () => showDialog<void>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                      title: const Text('Demo checkout'),
+                                      content: const Text(
+                                          'This is a demo. No payment is taken and no order is placed.'),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text('Close'))
+                                      ],
+                                    )),
+                        child: const Text('Demo checkout')),
                   ],
                 ),
               ),
             ],
           );
         },
-      ),
+      )),
     );
   }
 }
