@@ -80,6 +80,7 @@ Validación local del 5 de noviembre de 2026:
 | Pruebas unitarias y de widgets | 38 aprobadas, 0 fallidas |
 | Compilación web | Correcta |
 | Compilación APK debug | Correcta con JDK 21 aislado |
+| GitHub Actions | [Ejecución aprobada para 49110cd](https://github.com/MiguelArbelaez0/ECOMMERCE/actions/runs/42139013381) |
 | Persistencia Hive en archivos temporales | Reapertura, claves antiguas, concurrencia y corrupción verificadas |
 | API pública, comprobación puntual | HTTP 200 y 20 productos |
 | Chrome funcional y persistencia al recargar/reabrir | Validación manual confirmada por el autor, sin fallos |
@@ -88,7 +89,7 @@ Validación local del 5 de noviembre de 2026:
 | Android con catálogo real y revisión visual | Flujo confirmado manualmente por el autor, sin fallos |
 | Carrito habitual Android tras cierre completo | Producto ID 1, cantidad 1 y total 109.95 conservados; archivo e interfaz comprobados |
 
-Los widgets se ejercitaron a 320×640, 800×900 y 1440×900, además de texto al 200 % a 320×740. Las pruebas Android usan HTTP controlado; la revisión manual de Chrome usa el catálogo real. La integración usa un subdirectorio exclusivo de documentos. Además se comprobó el carrito habitual Android después de cerrar completamente el proceso: su contenido se conservó y el autor lo confirmó en pantalla. El workflow de GitHub Actions está configurado para formato, análisis, pruebas y compilaciones; aún no se ha ejecutado en remoto.
+Los widgets se ejercitaron a 320×640, 800×900 y 1440×900, además de texto al 200 % a 320×740. Las pruebas Android usan HTTP controlado; la revisión manual de Chrome usa el catálogo real. La integración usa un subdirectorio exclusivo de documentos. Además se comprobó el carrito habitual Android después de cerrar completamente el proceso: su contenido se conservó y el autor lo confirmó en pantalla. GitHub Actions ejecutó satisfactoriamente formato, análisis, las 38 pruebas y ambas compilaciones para el commit `49110cd`. Los controles del último commit se consultan en el [PR #5](https://github.com/MiguelArbelaez0/ECOMMERCE/pull/5/checks).
 
 ## Limitaciones
 

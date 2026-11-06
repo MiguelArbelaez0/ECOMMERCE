@@ -2,7 +2,7 @@
 
 Fecha: 5 de noviembre de 2026 (America/Bogota).
 
-**Estado: validación local completada en Chrome y Android, con persistencia comprobada.** El usuario autorizó publicar improvement/flutter-ecommerce y crear el PR después de pasar Android. CI remoto se comprobará tras publicar. La fusión y la eliminación de ramas continúan pendientes de autorización explícita. Este informe distingue pruebas automatizadas, revisión manual y compilaciones.
+**Estado: validación local completada en Chrome y Android, con persistencia comprobada.** El usuario autorizó publicar improvement/flutter-ecommerce y crear el PR después de pasar Android. La rama se publicó y se abrió el [PR #5](https://github.com/MiguelArbelaez0/ECOMMERCE/pull/5). GitHub Actions pasó para `49110cd` en la [ejecución 42139013381](https://github.com/MiguelArbelaez0/ECOMMERCE/actions/runs/42139013381); los controles del último commit del PR se verifican antes de solicitar la fusión. La fusión y la eliminación de ramas continúan pendientes de autorización explícita. Este informe distingue pruebas automatizadas, revisión manual y compilaciones.
 
 ## 1. Estado inicial de Git
 
@@ -49,7 +49,7 @@ Fecha: 5 de noviembre de 2026 (America/Bogota).
 - Confirmación de agregado después de persistir y cargar el carrito. Su snackbar tiene un mensajero local al detalle para que no tape acciones al volver a otra pantalla.
 - Cuadrícula adaptable, filtros sin retraso artificial, recuperación del filtro si su categoría desaparece, etiquetas accesibles, imágenes alternativas, subtotales y checkout explícitamente demostrativo.
 - Soporte web, permiso INTERNET en Android y reglas adicionales para excluir credenciales y resultados temporales. Se conservaron Gradle, AGP y Kotlin. Flutter añadió las opciones de compatibilidad `android.builtInKotlin=false` y `android.newDsl=false` durante la compilación.
-- Workflow con permisos de solo lectura y acciones fijadas a SHA para formato, análisis, pruebas y compilaciones. No se ha ejecutado en GitHub.
+- Workflow con permisos de solo lectura y acciones fijadas a SHA para formato, análisis, pruebas y compilaciones. Su [ejecución 42139013381](https://github.com/MiguelArbelaez0/ECOMMERCE/actions/runs/42139013381) finalizó en success para `49110cd`, con todos esos pasos aprobados.
 
 ## 5. Arquitectura final
 
@@ -137,7 +137,7 @@ Una primera consulta manual se hizo con carrito vacío; por eso no se contabiliz
 ## 12. Limitaciones pendientes y procedimiento
 
 1. Chrome y Android: los flujos con datos reales fueron confirmados manualmente por el autor. El agente ejecutó las pruebas y comprobó el contenido persistido, pero no completó una inspección visual independiente mediante Computer Use. La evidencia manual se atribuye expresamente al usuario.
-2. CI de GitHub pendiente de ejecución tras la publicación ya autorizada. El workflow tiene permisos de solo lectura, acciones fijadas a SHA, Flutter 3.47.5 y JDK 21. La etiqueta Flutter 3.47.5 existe en el repositorio oficial y coincide con el SDK local. No se afirma que el workflow haya pasado en remoto.
+2. CI de GitHub ejecutado satisfactoriamente para `49110cd` en [42139013381](https://github.com/MiguelArbelaez0/ECOMMERCE/actions/runs/42139013381). Cualquier commit posterior, incluido el de documentación que registra ese resultado, debe tener sus propios controles aprobados antes de fusionar; se consultan en [PR #5/checks](https://github.com/MiguelArbelaez0/ECOMMERCE/pull/5/checks). El workflow tiene permisos de solo lectura, acciones fijadas a SHA, Flutter 3.47.5 y JDK 21. La etiqueta Flutter 3.47.5 existe en el repositorio oficial y coincide con el SDK local. Se distingue la evidencia de esa ejecución concreta de la configuración del YAML y del estado dinámico de los controles del PR.
 3. El AVD original conserva todos sus datos y sigue corto de espacio. Se creó un AVD temporal independiente copiando solo la configuración y usando imágenes nuevas; no se borró ningún AVD ni se desinstalaron apps del usuario para conseguir espacio.
 4. Computer Use se detuvo por su control de identificación de URL; no se insistió con otra vía de interacción del navegador. El flujo Chrome se validó manualmente con el usuario.
 5. Hay instrucciones reproducibles en `docs/PLATFORM_VALIDATION.md`, tanto para las comprobaciones manuales como para las dos fases de reinicio Android. Usar IDs de dispositivo explícitos y conservar instalada la aplicación entre seed y verify.
@@ -192,7 +192,7 @@ Una primera consulta manual se hizo con carrito vacío; por eso no se contabiliz
 
 ## 14. Commits y cambios de seguimiento
 
-Commits originales: `daaf30d` (persistencia y estados), `6b78c73` (interfaz/web), `18d9cb0` (pruebas/CI), `ee76d80` (documentación).
+Commits originales: `daaf30d` (persistencia y estados), `6b78c73` (interfaz/web), `18d9cb0` (pruebas/CI), `ee76d80` (documentación). Seguimiento: `d73aba8` (persistencia Android entre procesos) y `49110cd` (validación funcional documentada). Este informe incorpora además el commit de evidencia de CI, cuyo hash se consulta en el historial del PR.
 
 El seguimiento añade una prueba de persistencia entre procesos Android, declara path_provider como dependencia directa de desarrollo sin cambiar su versión resuelta, y actualiza resultados y procedimientos. Los hashes definitivos se consultan con `git log --oneline main..improvement/flutter-ecommerce` antes de la fusión.
 
@@ -204,12 +204,12 @@ No se introdujeron cambios adicionales de lógica de producción en esta revisi�
 
 Base de entrega: `8625801`. La rama de trabajo es `improvement/flutter-ecommerce`; main y origin/main continúan sincronizadas con esa base en la última consulta.
 
-`git ls-remote --heads origin` y el conector GitHub confirman cuatro ramas remotas: main, mejoras y las dos codex. Ambas codex son antecesoras de main. `1838501` de mejoras es el único nodo exclusivo: `git diff origin/main...origin/mejoras` y el diff respecto de su segundo padre están vacíos; es descartable por contenido, no una mejora perdida.
+Antes de publicar se confirmaron cuatro ramas remotas: main, mejoras y las dos codex. Tras el push autorizado se añadió improvement/flutter-ecommerce: cinco ramas remotas en total. Ambas codex son antecesoras de main. `1838501` de mejoras es el único nodo exclusivo: `git diff origin/main...origin/mejoras` y el diff respecto de su segundo padre están vacíos; es descartable por contenido, no una mejora perdida.
 
-El usuario autorizó publicar la rama y crear el PR después de pasar Android. La secuencia es publicar, crear/revisar el PR, comprobar CI del commit propuesto y solicitar autorización explícita para fusionar. La eliminación de ramas requiere autorización y comprobación posterior a la fusión. No se ha efectuado ninguna de esas mutaciones remotas en este punto. El resultado Git definitivo se comprueba mediante status, log, branch -a y listado de GitHub, no se presupone en el informe.
+El usuario autorizó publicar la rama y crear el PR después de pasar Android. La secuencia es publicar, crear/revisar el PR, comprobar CI del commit propuesto y solicitar autorización explícita para fusionar. La eliminación de ramas requiere autorización y comprobación posterior a la fusión. El push y la creación del PR #5 ya se efectuaron con autorización. No se ha fusionado ni eliminado ninguna rama. El resultado Git definitivo se comprueba mediante status, log, branch -a y listado de GitHub, no se presupone en el informe.
 
 ## 16. Recomendación técnica
 
 Formato, análisis, 38 pruebas unitarias/widgets y compilaciones web/APK pasan. El flujo de Chrome fue confirmado sin fallos por el usuario y las 3 comprobaciones Android controladas pasan, incluida persistencia entre procesos.
 
-Android con datos reales y persistencia habitual ya fueron confirmados. La rama está preparada para publicación y PR con autorización concedida. Antes de fusionar deben pasar los controles de CI del commit propuesto y obtenerse autorización explícita; la limpieza también requiere autorización. No se declara aún alcanzado el estado final de una sola rama main.
+Android con datos reales y persistencia habitual ya fueron confirmados. La rama ya está publicada y el PR #5 está abierto. Existe una ejecución satisfactoria de CI para `49110cd`. Antes de fusionar deben pasar los controles de CI del commit propuesto y obtenerse autorización explícita; la limpieza también requiere autorización. No se declara aún alcanzado el estado final de una sola rama main.
