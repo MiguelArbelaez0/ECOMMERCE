@@ -1,5 +1,9 @@
 # E-Commerce Flutter
 
+> **Estado:** Completado  
+> **Versión:** `1.0.0+1 (pubspec.yaml)`  
+> **Tecnologías:** Flutter · Dart · BLoC · Dio · Hive · GetIt
+
 Aplicación de demostración con catálogo REST, filtros por categoría y carrito persistente. Construida con Flutter, Dart, BLoC, Dio, Hive y GetIt. El checkout explica el alcance de la demo: no procesa pagos ni crea pedidos.
 
 ## Funcionalidades
